@@ -1,2 +1,4 @@
-# pm
-PM: A KISS Password Manager, from Mailboxly.
+# Po
+Po: Password Organizer, from Mailboxly.
+
+Docs & FAQs coming soon. Stay tuned.
