@@ -62,7 +62,7 @@ def index():
         return redirect("https://po.mailboxly.com/");
     return staticFile("index.html", REPO_DIR);
 
-@app.get('/static/<filepath:path>')
+@app.get("/static/<filepath:path>")
 def serveStatic(filepath):
     if IS_PA:
         return abort(404, "File does not exist.");
