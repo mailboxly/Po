@@ -29,7 +29,7 @@ if IS_PA:
     MONGO_URL = os.environ["PA_MONGO_URL"];
 else:
     REPO_DIR = os.path.abspath(".");
-    MONGO_URL = "mongodb://localhost:27017/localPo"
+    MONGO_URL = "mongodb://localhost:27017/localPo";
 
 ### Globals ::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -79,6 +79,13 @@ def validateLogin(reqData):
     mHash = reqData.get("mHash");
     return username, mHash;
 
+def validateUpdate(reqData):
+    # TODO
+    username = reqData.get("username");
+    mHash = reqData.get("mHash");
+    ct = reqData.get("ct");
+    return username, mHash, ct;
+
 ### Routes :::::::::::::::::::::::::::::::::::::::::::::::::
 
 @app.get("/")
@@ -108,7 +115,7 @@ def v0_signup():
         "mHash": mHash,
         "hint": hint,
         "email": email,
-        "json": "{}"
+        "ct": None
     });
     return {"status": "success"};
 
@@ -122,6 +129,17 @@ def v0_login():
     if not user:
         return {"status": "fail", "reason": "Incorrect username or password."};
     return {"status": "success", "user": user};
+
+@app.post("/api-v0/updateCt")
+def v0_update():
+    username, mHash, ct = validateUpdate(request.forms);
+    cursor = db.userCol.update_one(
+        {"_id": username, "mHash": mHash},
+        {"$set": {"ct": ct}}
+    );
+    if not cursor.matched_count:
+        return {"status": "fail", "reason": "Incorrect username or password."};
+    return {"status": "success"};
 
 # Running on PA ::::::::::::::::::::::::::::::::::::::::::::
 application = app;

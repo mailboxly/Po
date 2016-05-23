@@ -125,61 +125,80 @@
         </form>
 
     </div>
-    <div class="screen" id="adder">
-        <a href="#dashboard" class="btn btn-info pull-right">
-            <span class="glyphicon glyphicon-chevron-right"></span> To Dashboard
-        </a>
-        <h2>Add a Password:</h2>
-        <form>
-            <div class="row">
-                <div class="col-md-3">
-                    <input name="service" placeholder="Service" class="form-control" required> 
-                </div>
-                <div class="col-md-9">
-                    <sub>The 3<sup>rd</sup> party service, with which you have an account. Eg. Facebook, Twitter etc.</sub>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
-                    <input name="serviceUsername" placeholder="Username (for the service)" class="form-control"> 
-                </div>
-                <div class="col-md-9">
-                    <sub>Username associated with the service. Can be left blank.</sub>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
-                    <input name="serviceEmail" placeholder="Email (for the service)" class="form-control"> 
-                </div>
-                <div class="col-md-9">
-                    <sub>The email address associated with the service. Can be left blank.</sub>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
-                    <input name="servicePassword" type="password" placeholder="Password (for the service)" class="form-control" required> 
-                </div>
-                <div class="col-md-9">
-                    <sub>Password associated with the service.</sub>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
-                    <input name="serviceExtraInfo" placeholder="Additional information" class="form-control"> 
-                </div>
-                <div class="col-md-9">
-                    <sub>Any additional information with regard to the service. Can be left blank.</sub>
-                </div>
-            </div>
-            <br>
-            <button class="btn btn-primary">Add Password</button>
-        </form>
-    </div>
-    <div class="screen" id="dashboard">
-        <a href="#adder" class="btn btn-info pull-right">
-            <span class="glyphicon glyphicon-plus-sign"></span> Add Password
-        </a>
+    <div class="screen" id="dash">
+        <div class="pull-right">
+            <button data-bind="click: addItem" class="btn btn-info">
+                <span class="glyphicon glyphicon-plus-sign"></span> Add Password
+            </button>
+            <button data-bind="click: logout" class="btn btn-default">
+                <span class="glyphicon glyphicon-log-out"></span> Logout
+            </button>
+        </div>
         <h2>Dashboard</h2>
+        <center class="row">
+            <div class="col-md-2">
+                <b>Service</b>
+            </div>
+            <div class="col-md-2">
+                <b>Username</b>
+            </div>
+            <div class="col-md-2">
+                <b>Email</b>
+            </div>
+            <div class="col-md-2">
+                <b>Password</b>
+            </div>
+            <div class="col-md-2">
+                <b>Extra</b>
+            </div>
+            <div class="col-md-2">
+                <b>Actions</b>
+            </div>
+        </center>
+        <hr>
+        <div data-bind="foreach: data">
+            <p></p>
+            <center data-bind="if: isEditable" class="row">
+                <div class="col-md-2">
+                    <input data-bind="textInput: service" name="service" placeholder="Service" class="form-control"> 
+                </div>
+                <div class="col-md-2">
+                    <input data-bind="textInput: username" name="username" placeholder="Username" class="form-control"> 
+                </div>
+                <div class="col-md-2">
+                    <input data-bind="textInput: email" name="email" placeholder="Email" class="form-control"> 
+                </div>
+                <div class="col-md-2">
+                    <input data-bind="textInput: password" name="password" type="password" placeholder="Password" class="form-control"> 
+                </div>
+                <div class="col-md-2">
+                    <input data-bind="textInput: extra" name="extra" placeholder="Additional information" class="form-control"> 
+                </div>
+                <div class="col-md-2">
+                    <button data-bind="click: $parent.acceptItem" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-ok text-success"></span>
+                    </button>
+                    <button class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-remove text-danger"></span>
+                    </button>
+                </div>
+            </center>
+            <center data-bind="ifnot: isEditable" class="row">
+                <div data-bind="text: service" class="col-md-2"></div>
+                <div data-bind="text: username" class="col-md-2"></div>
+                <div data-bind="text: email" class="col-md-2"></div>
+                <div data-bind="text: password" class="col-md-2"></div>
+                <div data-bind="text: extra" class="col-md-2"></div>
+                <div class="col-md-2">
+                    <button data-bind="click: $parent.editItem" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-edit text-info"></span>
+                    </button>
+                    <button data-bind="click: $parent.removeItem" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-remove text-danger"></span>
+                    </button>
+                </div>
+            </center>
+        </div>
     </div>
     <div class="screen" id="terms">
         <p>
@@ -220,6 +239,7 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">&lt
         </center>
     </footer>
     <script src="static/jquery.min.js"></script>
+    <script src="static/knockout.min.js"></script>
     <script src="static/sjcl.js"></script>
     <script src="static/app.js"></script>
 </body>

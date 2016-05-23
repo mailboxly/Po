@@ -76,7 +76,7 @@
         id = location.hash.slice(1) || "arbitrary";
         $screen = $("div.screen#" + id);
         $others = $("div.screen:not(#" + id + ")");
-        handler = po[id] && po[id].onOpen;
+        handler = po[id] && po[id].open;
         if (!$screen.length) {
             location.hash = "index";
             return null;
@@ -95,9 +95,9 @@
     // Signup ::::::::::::::::::::::::::::::::::::::::::::::
     
     po.signup = {};
-    po.signup.onOpen = function () {
+    po.signup.open = function () {
         if (po.currentUser) {
-            location.hash = "dashboard";
+            location.hash = "dash";
         } else {
             console.assert(po.currentUser === null);
         }
@@ -108,31 +108,33 @@
         return true;
     };
     po.signup.$form.on("submit", function (event) {
-        var fdata, dataToSend;
+        var fdata, mHash, dataToSend;
         event.preventDefault();
         fdata = po.readForm(event.target);
         po.signup.validate(fdata);   // TODO: Write validator.
+        mHash = po.hash(fdata.mPassword);
         dataToSend = {
             "username": fdata.username,
-            "mHash": po.hash(fdata.mPassword),
+            "mHash": mHash,
             "hint": fdata.hint,
             "email": fdata.email
         };
         po.api("signup", dataToSend, function (sResp) {
-            po.signup.handleSignupResp(sResp, fdata);
+            po.signup.handleSignupResp(sResp, fdata, mHash);
         });
     });
-    po.signup.handleSignupResp = function (sResp, fdata) {
+    po.signup.handleSignupResp = function (sResp, fdata, mHash) {
         po.currentUser = $.extend({}, fdata);
-        location.hash = "dashboard";
+        po.currentUser.mHash = mHash;
+        location.hash = "dash";
     };
     
     // Login :::::::::::::::::::::::::::::::::::::::::::::::
     
     po.login = {};
-    po.login.onOpen = function () {
+    po.login.open = function () {
         if (po.currentUser) {
-            location.hash = "dashboard";
+            location.hash = "dash";
         } else {
             console.assert(po.currentUser === null);
         }
@@ -143,38 +145,97 @@
         return true;
     };
     po.login.$form.on("submit", function (event) {
-        var fdata, dataToSend;
+        var fdata, mHash, dataToSend;
         event.preventDefault();
         fdata = po.readForm(event.target);
         po.login.validate(fdata);   // TODO: Write validator.
+        mHash = po.hash(fdata.mPassword);
         dataToSend = {
             "username": fdata.username,
-            "mHash": po.hash(fdata.mPassword)
+            "mHash": mHash
         };
         po.api("login", dataToSend, function (lResp) {
-            po.login.handleLoginResp(lResp, fdata);
+            po.login.handleLoginResp(lResp, fdata, mHash);
         });
     });
-    po.login.handleLoginResp = function (lResp, fdata) {
+    po.login.handleLoginResp = function (lResp, fdata, mHash) {
+        var ct, pt, rawData;
         po.currentUser = $.extend({}, fdata, lResp.user);
-        location.hash = "dashboard";
+        po.mHash = mHash;
+        ct = lResp.user.ct;
+        if (ct) {
+            pt = sjcl.decrypt(po.currentUser.mPassword, ct);
+            rawData = JSON.parse(pt);
+            po.dash.data(rawData.map(function (rawItem) {
+                var item;
+                item = {};
+                Object.keys(rawItem).forEach(function (key) {
+                    item[key] = ko.observable(rawItem[key]);
+                });
+                return item;
+            }));
+        } else {
+            po.dash.data([]);
+        }
+        location.hash = "dash";
     };
     
-    // Password Adder ::::::::::::::::::::::::::::::::::::::
+    // Dashboard (AKA Dash) ::::::::::::::::::::::::::::::::
     
-    po.adder = {};
-    /*po.adder.onOpen = function () {
+    po.dash = {};
+    po.dash.open = function () {
         if (!po.currentUser) {
             location.hash = "index";
         } else {
-            console.assert(po.currentUser); // TODO: Write validtor.
+            console.assert(po.currentUser);
         }
-    };*/
-    po.adder.$form = $("#adder form");
-    po.adder.$form.on("submit", function (event) {
-        var fdata, dataToSend;
-        event.preventDefault();
-    });
+    }
+    po.dash.data = ko.observableArray([]);
+    po.dash.sync = function () {
+        var pt, ct, dataToSend;
+        pt = ko.toJSON(po.dash.data);
+        ct = sjcl.encrypt(po.currentUser.mPassword, pt);
+        dataToSend = {
+            username: po.currentUser.username,
+            mHash: po.currentUser.mHash,
+            ct: ct
+        };
+        po.api("updateCt", dataToSend, function (uResp) {
+            console.log("Data synced.");
+        });
+    };
+    po.dash.addItem = function () {
+        var item = {
+            id: Date.now(),
+            service: ko.observable(""),
+            username: ko.observable(""),
+            email: ko.observable(""),
+            password: ko.observable(""),
+            extra: ko.observable(""),
+            isEditable: ko.observable(true)
+        };
+        po.dash.data.unshift(item);
+        // Not calling po.dash.sync();
+    };
+    po.dash.acceptItem = function (item) {
+        item.isEditable(false);
+        po.dash.sync();
+    };
+    po.dash.editItem = function (item) {
+        item.isEditable(true);
+        // Not calling po.dash.sync();
+    };
+    po.dash.removeItem = function (item) {
+        po.dash.data.remove(item);
+        po.dash.sync();
+    };
+    po.dash.logout = function () {
+        po.currentUser = null;
+        po.dash.data([]);
+        location.hash = "index";
+    };
+    ko.applyBindings(po.dash, $("#dash")[0]);
+    
     /*po.api("ping", {}, function (resp) {
         alert(JSON.stringify(resp));
     });*/
