@@ -46,7 +46,7 @@
                alert(resp.reason);
             }
         };
-        $.post(po.API_BASE + name, dataToSend, wrapper, "json");
+        return $.post(po.API_BASE + name, dataToSend, wrapper, "json");
     };
     po.readForm = function (form) {
         var $form = $(form),

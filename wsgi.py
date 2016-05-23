@@ -41,7 +41,7 @@ staticFile = bottle.static_file;
 
 app = bottle.Bottle();
 
-dbClient = pymongo.MongoClient(MONGO_URL);
+dbClient = pymongo.MongoClient(MONGO_URL, connect=False);
 db = dbClient[MONGO_URL.split("/")[-1]];
 
 ### Plugins ::::::::::::::::::::::::::::::::::::::::::::::::
