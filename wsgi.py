@@ -19,11 +19,17 @@
 import os;
 import functools;
 import bottle;
+import pymongo;
 
 ### Constants ::::::::::::::::::::::::::::::::::::::::::::::
 
 IS_PA = True if "PA_REPO_DIR" in os.environ else False;
-REPO_DIR = os.environ.get("PA_REPO_DIR", os.path.abspath("."));
+if IS_PA:
+    REPO_DIR = os.environ["PA_REPO_DIR"];
+    MONGO_URL = os.environ["PA_MONGO_URL"];
+else:
+    REPO_DIR = os.path.abspath(".");
+    MONGO_URL = "mongodb://localhost:27017/localPo"
 
 ### Globals ::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -34,6 +40,9 @@ redirect = bottle.redirect;
 staticFile = bottle.static_file;
 
 app = bottle.Bottle();
+
+dbClient = pymongo.MongoClient(MONGO_URL);
+db = dbClient[MONGO_URL.split("/")[-1]];
 
 ### Plugins ::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -54,6 +63,22 @@ def plugin_allowCORS(oldFunc):
     return functools.update_wrapper(newFunc, oldFunc);
 app.install(plugin_allowCORS);
 
+### Data format validators :::::::::::::::::::::::::::::::::
+
+def validateSignup(reqData):
+    # TODO
+    username = reqData.get("username");
+    mHash = reqData.get("mHash");
+    hint = reqData.get("hint");
+    email = reqData.get("email");
+    return username, mHash, hint, email;
+
+def validateLogin(reqData):
+    # TODO
+    username = reqData.get("username");
+    mHash = reqData.get("mHash");
+    return username, mHash;
+
 ### Routes :::::::::::::::::::::::::::::::::::::::::::::::::
 
 @app.get("/")
@@ -68,14 +93,39 @@ def serveStatic(filepath):
         return abort(404, "File does not exist.");
     return staticFile("static/" + filepath, REPO_DIR);
 
-@app.get("/api/ping")
-@app.post("/api/ping")
+@app.get("/api-v0/ping")
+@app.post("/api-v0/ping")
 def ping():
     return {"status": "success"};
+
+@app.post("/api-v0/signup")
+def v0_signup():
+    username, mHash, hint, email = validateSignup(request.forms);
+    if db.userCol.find_one(username):
+        return {"status": "fail", "reason": "Username not available."};
+    db.userCol.insert_one({
+        "_id": username,
+        "mHash": mHash,
+        "hint": hint,
+        "email": email,
+        "json": "{}"
+    });
+    return {"status": "success"};
+
+@app.post("/api-v0/login")
+def v0_login():
+    username, mHash = validateLogin(request.forms);
+    user = db.userCol.find_one({
+        "_id": username,
+        "mHash": mHash
+    });
+    if not user:
+        return {"status": "fail", "reason": "Incorrect username or password."};
+    return {"status": "success", "user": user};
 
 # Running on PA ::::::::::::::::::::::::::::::::::::::::::::
 application = app;
 
 # Running locally ::::::::::::::::::::::::::::::::::::::::::
 if not IS_PA and __name__ == "__main__":
-    app.run(port=8000, debug=True, reloader=True);
+    app.run(debug=True, reloader=True);

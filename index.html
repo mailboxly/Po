@@ -22,12 +22,205 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="static/bootstrap/css/bootstrap.min.css">
+    <style>
+        .screen { display: none; }
+        form
+    </style>
     <title>Po: Password organizer, from Mailboxly.</title>
 </head>
 <body class="container">
-    <h3>Po: <b>P</b>assword <b>o</b>rganizer <small>By Mailboxly</small></h3>
+    <header>
+        <center>
+            <h3>Po<small>: The secure password organizer, from Mailboxly.</small></h3>
+            <hr>
+        </center>
+    </header>
+    <div class="screen" id="index" style="display: block;">
+        <div class="jumbotron">
+            <h1>Never Forget Passwords</h1>
+            <p>
+                <b>Po</b> is a secure <b>p</b>assword <b>o</b>rganizer, built by <a href="http://www.mailboxly.com/">Mailboxly</a>.<br>
+                It helps you safely store and generate strong passwords.
+            </p>
+            <p>It's open source & totally FREE! Try it out:</p>
+            <p>
+                <a href="#signup" class="btn btn-primary btn-lg"><b>Signup</b></a>
+                <sub><sup>OR</sup></sub>
+                <a href="#login" class="btn btn-default btn-lg">Login</a>
+            </p>
+        </div>
+    </div>
+    <div class="screen" id="signup">
+        <h2>Signup!</h2>
+        <form>
+            <p>Required:</p>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="username" placeholder="Username" class="form-control" required> 
+                </div>
+                <div class="col-md-9">
+                    <sub>Your username could be anything you like. It can be your email address.</sub>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="mPassword" type="password" placeholder="Master Password" class="form-control" required>
+                </div>
+                <div class="col-md-9">
+                    <sub>This is the only password you'll have to remember. You'll use it for Po logins.</sub>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="mPasswordAgain" type="password" placeholder="Repeat Master Password" class="form-control" required>
+                </div>
+                <div class="col-md-9">
+                    <sub>Please re-enter your master password. This is just to help avoid typos.</sub>
+                </div>
+            </div>
+            <br>
+            <p>Optional:</p>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="hint" placeholder="Hint (optional)" class="form-control">
+                </div>
+                <div class="col-md-9">
+                    <sub>If you believe you might forget your password, enter a hint for remembering.</sub>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="email" placeholder="Email (for recovering hint)" class="form-control" required>
+                </div>
+                <div class="col-md-9">
+                    <sub>If you forget your master password, we'll send your hit to this email.</sub>
+                </div>
+            </div>
+            <br>
+            <p>By signing up, you accept our <a href="#terms">Terms</a>.</p>
+            <button class="btn btn-primary">Signup</button>
+        </form>
+    </div>
+    <div class="screen" id="login">
+        <h2>Login</h2>
+        <form>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="username" placeholder="Username" class="form-control" required> 
+                </div>
+                <div class="col-md-9">
+                    <sub>Your Po username. This might be the same as your email.</sub>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="mPassword" type="password" placeholder="Master Password" class="form-control" required> 
+                </div>
+                <div class="col-md-9">
+                    <sub>Your Master Password username.</sub>
+                </div>
+            </div>
+            <br>
+            <button class="btn btn-primary">Login</button>
+        </form>
+
+    </div>
+    <div class="screen" id="adder">
+        <a href="#dashboard" class="btn btn-info pull-right">
+            <span class="glyphicon glyphicon-chevron-right"></span> To Dashboard
+        </a>
+        <h2>Add a Password:</h2>
+        <form>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="service" placeholder="Service" class="form-control" required> 
+                </div>
+                <div class="col-md-9">
+                    <sub>The 3<sup>rd</sup> party service, with which you have an account. Eg. Facebook, Twitter etc.</sub>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="serviceUsername" placeholder="Username (for the service)" class="form-control"> 
+                </div>
+                <div class="col-md-9">
+                    <sub>Username associated with the service. Can be left blank.</sub>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="serviceEmail" placeholder="Email (for the service)" class="form-control"> 
+                </div>
+                <div class="col-md-9">
+                    <sub>The email address associated with the service. Can be left blank.</sub>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="servicePassword" type="password" placeholder="Password (for the service)" class="form-control" required> 
+                </div>
+                <div class="col-md-9">
+                    <sub>Password associated with the service.</sub>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="serviceExtraInfo" placeholder="Additional information" class="form-control"> 
+                </div>
+                <div class="col-md-9">
+                    <sub>Any additional information with regard to the service. Can be left blank.</sub>
+                </div>
+            </div>
+            <br>
+            <button class="btn btn-primary">Add Password</button>
+        </form>
+    </div>
+    <div class="screen" id="dashboard">
+        <a href="#adder" class="btn btn-info pull-right">
+            <span class="glyphicon glyphicon-plus-sign"></span> Add Password
+        </a>
+        <h2>Dashboard</h2>
+    </div>
+    <div class="screen" id="terms">
+        <p>
+            <button onclick="history.back();" class="btn btn-info">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                Go Back
+            </button>
+        </p>
+        <br>
+        <p><big>Terms:</big></p>
+        <pre>
+Po: A secure password organizer from <a href="http://www.mailboxly.com/">Mailboxly</a>.
+Copyright (C) 2016  CrispQ Information Technologies Pvt. Ltd.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt;</a>.
+        </pre>
+        <p>
+            <a href="https://github.com/mailboxly/po/blob/gh-pages/LICENSE" target="_blank" class="btn btn-info">Full License</a>
+            <a href="https://github.com/mailboxly/po" target="_blank" class="btn btn-info">Source Code</a>
+        </p>
+    </div>
+    <footer>
+        <hr>
+        <center>
+            &copy; 2016 CrispQ Information Technologies Pvt. Ltd. |
+            <a href="https://github.com/mailboxly/po/blob/gh-pages/LICENSE">License: AGPLv3</a>
+        </center>
+    </footer>
     <script src="static/jquery.min.js"></script>
-    <script src="static/knockout.min.js"></script>
+    <script src="static/sjcl.js"></script>
     <script src="static/app.js"></script>
 </body>
 </html>
