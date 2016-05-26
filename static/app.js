@@ -28,7 +28,7 @@
     
     // Globals :::::::::::::::::::::::::::::::::::::::::::::
     
-    po.IS_PA = location.href === "https://po.mailboxly.com/";
+    po.IS_PA = location.hostname === "po.mailboxly.com";
     if (po.IS_PA) {
         po.API_BASE = "https://pmmailboxly.pythonanywhere.com/api-v0/";
     } else {
