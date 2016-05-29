@@ -68,6 +68,13 @@
     po.hash = function (s) {
         return sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(s));
     };
+    po.encrypt = function (plaintext) {
+        // AES-256-CCM
+        return sjcl.encrypt(po.currentUser.mPassword, plaintext, {ks: 256});
+    };
+    po.decrypt = function (ciphertext) {
+        return sjcl.decrypt(po.currentUser.mPassword, ciphertext);
+    };
 
     // Routing :::::::::::::::::::::::::::::::::::::::::::::
     
@@ -164,7 +171,8 @@
         po.mHash = mHash;
         ct = lResp.user.ct;
         if (ct) {
-            pt = sjcl.decrypt(po.currentUser.mPassword, ct);
+            //pt = sjcl.decrypt(po.currentUser.mPassword, ct);
+            pt = po.decrypt(ct);
             rawData = JSON.parse(pt);
             po.dash.data(rawData.map(function (rawItem) {
                 var item;
@@ -194,7 +202,8 @@
     po.dash.sync = function () {
         var pt, ct, dataToSend;
         pt = ko.toJSON(po.dash.data);
-        ct = sjcl.encrypt(po.currentUser.mPassword, pt);
+        //ct = sjcl.encrypt(po.currentUser.mPassword, pt);
+        ct = po.encrypt(pt);
         dataToSend = {
             username: po.currentUser.username,
             mHash: po.currentUser.mHash,
@@ -219,6 +228,7 @@
     };
     po.dash.acceptItem = function (item) {
         item.isEditable(false);
+        item.extra(item.extra() || "None");
         po.dash.sync();
     };
     po.dash.editItem = function (item) {

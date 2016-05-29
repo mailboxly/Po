@@ -20,7 +20,7 @@ Po is a **zero-knowledge system**. We don't store a user's passwords, not even t
 
 The client maintains an array of account information objects. Each account information object corresponds to one account, and includes the account's username, password, email etc. This array is never sent to the serve. It remains on the client, in a variable. It is not stored in `localStorage` or `sessionStorage`.
 
-When a password is added, deleted or edited, the underlying array changes. The changed array is mapped to a JSON string, which is then encrypted using SJCL (AES encryption). The encryption password is the MP. Finally the encrypted JSON string is sent to the server.
+When a password is added, deleted or edited, the underlying array changes. The changed array is mapped to a JSON string, which is then encrypted using AES-256-CCM (SJCL). The encryption password is the MP. Finally the encrypted JSON string is sent to the server.
 
 ## Running Po Locally
 
