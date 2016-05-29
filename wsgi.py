@@ -18,6 +18,7 @@
 
 import os;
 import functools;
+import time;
 import bottle;
 import pymongo;
 
@@ -30,6 +31,9 @@ if IS_PA:
 else:
     REPO_DIR = os.path.abspath(".");
     MONGO_URL = "mongodb://localhost:27017/localPo";
+
+SHOULD_ADD_LOCAL_DELAY = False;
+ADDED_LOCAL_DELAY = 3; # In seconds. For simulating latency.
 
 ### Globals ::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -62,6 +66,14 @@ def plugin_allowCORS(oldFunc):
         return oldFunc(*args, **kwargs);
     return functools.update_wrapper(newFunc, oldFunc);
 app.install(plugin_allowCORS);
+
+def plugin_addLocalDelay(oldFunc):
+    def newFunc(*args, **kwargs):
+        time.sleep(ADDED_LOCAL_DELAY);
+        return oldFunc(*args, **kwargs);
+    return functools.update_wrapper(newFunc, oldFunc);
+if not IS_PA and SHOULD_ADD_LOCAL_DELAY:
+    app.install(plugin_addLocalDelay);
 
 ### Data format validators :::::::::::::::::::::::::::::::::
 

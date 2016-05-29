@@ -37,6 +37,7 @@
     <header>
         <center>
             <h3><big><b>Po</b></big>: Password organizer</h3>
+            <p class="statusbar bg-warning"></p>
             <hr>
         </center>
     </header>
@@ -154,6 +155,11 @@
             </button>
         </div>
         <br>
+        <p data-bind="if: data().length === 0">
+            <h3>Welcome to Po!</h3>
+            <p>As yet, you haven't added any passwords.</p>
+            <p>To add a password, click the "Add Password" button.</p>
+        </p>
         <div data-bind="foreach: data" class="row">
             <div data-bind="visible: isEditable()" class="col-md-4">
                 <input data-bind="textInput: service" name="service" placeholder="Service" class="form-control input-sm">

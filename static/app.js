@@ -75,6 +75,12 @@
     po.decrypt = function (ciphertext) {
         return sjcl.decrypt(po.currentUser.mPassword, ciphertext);
     };
+    po.showStatus = function (status) {
+        $(".statusbar").text(status || "Loading ...");
+    };
+    po.hideStatus = function () {
+        $(".statusbar").text("");
+    };
 
     // Routing :::::::::::::::::::::::::::::::::::::::::::::
     
@@ -117,6 +123,7 @@
     po.signup.$form.on("submit", function (event) {
         var fdata, mHash, dataToSend;
         event.preventDefault();
+        po.showStatus("Signing up ...");
         fdata = po.readForm(event.target);
         po.signup.validate(fdata);   // TODO: Write validator.
         mHash = po.hash(fdata.mPassword);
@@ -131,6 +138,7 @@
         });
     });
     po.signup.handleSignupResp = function (sResp, fdata, mHash) {
+        po.hideStatus();
         po.currentUser = $.extend({}, fdata);
         po.currentUser.mHash = mHash;
         location.hash = "dash";
@@ -154,6 +162,7 @@
     po.login.$form.on("submit", function (event) {
         var fdata, mHash, dataToSend;
         event.preventDefault();
+        po.showStatus("Logging in ...");
         fdata = po.readForm(event.target);
         po.login.validate(fdata);   // TODO: Write validator.
         mHash = po.hash(fdata.mPassword);
@@ -167,6 +176,7 @@
     });
     po.login.handleLoginResp = function (lResp, fdata, mHash) {
         var ct, pt, rawData;
+        po.hideStatus();
         po.currentUser = $.extend({}, fdata, lResp.user);
         po.mHash = mHash;
         ct = lResp.user.ct;
@@ -221,7 +231,8 @@
             email: ko.observable(""),
             password: ko.observable(""),
             extra: ko.observable(""),
-            isEditable: ko.observable(true)
+            isEditable: ko.observable(true),
+            isRevealed: ko.observable(false)//,
         };
         po.dash.data.unshift(item);
         // Not calling po.dash.sync();
