@@ -37,17 +37,6 @@
 
     // Helpers :::::::::::::::::::::::::::::::::::::::::::::
     
-    po.api = function (name, dataToSend, callback) {
-        var wrapper;
-        wrapper = function (resp) {
-            if (resp.status === "success") {
-                callback(resp);
-            } else {
-               alert(resp.reason);
-            }
-        };
-        return $.post(po.API_BASE + name, dataToSend, wrapper, "json");
-    };
     po.readForm = function (form) {
         var $form = $(form),
             $fields = $.merge(
@@ -80,6 +69,44 @@
     };
     po.hideStatus = function () {
         $(".statusbar").text("");
+    };
+    po.timedStatus = function (status, time_sec) {
+        time_sec = time_sec || 2;
+        po.showStatus(status);
+        window.setTimeout(function () {
+            po.hideStatus();
+        }, time_sec * 1000);
+    };
+    po.api = function (name, dataToSend, callback) {
+        var wrapper;
+        wrapper = function (resp) {
+            if (resp.status === "success") {
+                callback(resp);
+            } else {
+               po.hideStatus();
+               alert(resp.reason);
+            }
+        };
+        return $.post(po.API_BASE + name, dataToSend, wrapper, "json");
+    };
+    po.pickRandom = function (seq) {
+        var r = Math.floor((Math.random() * seq.length));
+        return seq[r];
+    };
+    po.generatePassword = function (maxLength/*=30*/) {
+        var charset, password, i;
+        maxLength = maxLength || 30;
+        charset =  (
+            "abcedfghijklmnopqrstuvwxyz" +
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "0123456789" + "`-=[];',./" +
+            "!@#$%^&*()" + "~_+{}:\"<>?"
+        );
+        password = "";
+        for (i = 0; i < maxLength; i += 1) {
+            password += po.pickRandom(charset);
+        };
+        return password;
     };
 
     // Routing :::::::::::::::::::::::::::::::::::::::::::::
@@ -128,7 +155,7 @@
         po.signup.validate(fdata);   // TODO: Write validator.
         mHash = po.hash(fdata.mPassword);
         dataToSend = {
-            "username": fdata.username,
+            "username": fdata.username.toUpperCase(),
             "mHash": mHash,
             "hint": fdata.hint,
             "email": fdata.email
@@ -167,7 +194,7 @@
         po.login.validate(fdata);   // TODO: Write validator.
         mHash = po.hash(fdata.mPassword);
         dataToSend = {
-            "username": fdata.username,
+            "username": fdata.username.toUpperCase(),
             "mHash": mHash
         };
         po.api("login", dataToSend, function (lResp) {
@@ -185,12 +212,23 @@
             pt = po.decrypt(ct);
             rawData = JSON.parse(pt);
             po.dash.data(rawData.map(function (rawItem) {
-                var item;
+                /*var item;
                 item = {};
+                item.
                 Object.keys(rawItem).forEach(function (key) {
                     item[key] = ko.observable(rawItem[key]);
                 });
-                return item;
+                return item;*/
+                return {
+                    id: ko.observable(rawItem.id),
+                    service: ko.observable(rawItem.service),
+                    username: ko.observable(rawItem.username),
+                    email: ko.observable(rawItem.email),
+                    password: ko.observable(rawItem.password),
+                    extra: ko.observable(rawItem.extra),
+                    isEditable: ko.observable(false),
+                    isRevealed: ko.observable(false)//,
+                };
             }));
         } else {
             po.dash.data([]);
@@ -215,12 +253,12 @@
         //ct = sjcl.encrypt(po.currentUser.mPassword, pt);
         ct = po.encrypt(pt);
         dataToSend = {
-            username: po.currentUser.username,
+            username: po.currentUser.username.toUpperCase(),
             mHash: po.currentUser.mHash,
             ct: ct
         };
         po.api("updateCt", dataToSend, function (uResp) {
-            console.log("Data synced.");
+            po.timedStatus("Your data has been encrypted and synced.");
         });
     };
     po.dash.addItem = function () {
@@ -239,7 +277,6 @@
     };
     po.dash.acceptItem = function (item) {
         item.isEditable(false);
-        item.extra(item.extra() || "None");
         po.dash.sync();
     };
     po.dash.editItem = function (item) {
@@ -249,6 +286,37 @@
     po.dash.removeItem = function (item) {
         po.dash.data.remove(item);
         po.dash.sync();
+    };
+    po.dash.revealPassword = function (item) {
+        item.isRevealed(true);
+    };
+    po.dash.concealPassword = function (item) {
+        item.isRevealed(false);
+    };
+    po.dash.generatePassword = function (item) {
+        var password;
+        password = po.generatePassword();
+        prompt(
+            "A new password has been generated.\n" + 
+            "To copy, press Crtl+C and then Enter.",
+            password
+        );
+        item.password(password);
+    };
+    po.dash.promptPassword = function (item) {
+        var password;
+        password = item.password();
+        if (password) {
+            prompt(
+                "Here's your password.\n" +
+                "To copy, press Crtl+C and then Enter.",
+                password
+            );
+        } else {
+            alert(
+                "Your password is empty."
+            );
+        }
     };
     po.dash.logout = function () {
         po.currentUser = null;

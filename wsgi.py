@@ -33,7 +33,7 @@ else:
     MONGO_URL = "mongodb://localhost:27017/localPo";
 
 SHOULD_ADD_LOCAL_DELAY = False;
-ADDED_LOCAL_DELAY = 3; # In seconds. For simulating latency.
+ADDED_LOCAL_DELAY = 1; # In seconds. For simulating latency.
 
 ### Globals ::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -155,40 +155,54 @@
             </button>
         </div>
         <br>
-        <p data-bind="if: data().length === 0">
+        <div data-bind="if: data().length === 0">
             <h3>Welcome to Po!</h3>
             <p>As yet, you haven't added any passwords.</p>
             <p>To add a password, click the "Add Password" button.</p>
-        </p>
+        </div>
         <div data-bind="foreach: data" class="row">
-            <div data-bind="visible: isEditable()" class="col-md-4">
-                <input data-bind="textInput: service" name="service" placeholder="Service" class="form-control input-sm">
-                <input data-bind="textInput: username" name="username" placeholder="Username" class="form-control input-sm"> 
-                <input data-bind="textInput: email" name="email" placeholder="Email" class="form-control input-sm"> 
-                <input data-bind="textInput: password" name="password" type="password" placeholder="Password" class="form-control input-sm"> 
-                <input data-bind="textInput: extra" name="extra" placeholder="Additional information" class="form-control input-sm"> 
+            <div data-bind="visible: isEditable()" class="col-sm-6 col-md-4">
+                <small>All fields are optional. Fill them as you please.</small>
+                <input data-bind="textInput: service" placeholder="Service (eg. Facebook, Twitter etc.)" class="form-control">
+                <input data-bind="textInput: username" placeholder="Username (eg. john.doe1, @john.doe etc.)" class="form-control"> 
+                <input data-bind="textInput: email" name="email" placeholder="Email (eg. john.doe@example.com)" class="form-control"> 
+                <input data-bind="textInput: password" type="password" placeholder="Password (for the Service)" class="form-control"> 
+                <input data-bind="textInput: extra" name="extra" placeholder="Any extra information" class="form-control"> 
                 <br>
                 <button data-bind="click: $parent.acceptItem" class="btn btn-default btn-sm">
-                    <span class="glyphicon glyphicon-ok text-success"></span> Save
+                    <span class="glyphicon glyphicon-ok text-success"></span> Done
                 </button>
-                <button class="btn btn-default btn-sm">
+                <button data-bind="click: $parent.removeItem" class="btn btn-default btn-sm">
                     <span class="glyphicon glyphicon-remove text-danger"></span> Delete
+                </button>
+                <button data-bind="click: $parent.generatePassword" class="btn btn-default btn-sm">
+                    <span class="glyphicon glyphicon-flash text-warning"></span> Generate
+                </button>
+                <button data-bind="click: $parent.promptPassword" class="btn btn-default btn-sm">
+                    <span class="glyphicon glyphicon-eye-open"></span> Prompt
                 </button>
                 <br><br>
             </div>
-            <div data-bind="visible: !isEditable()" class="col-md-4">
-                <table class="table table-condensed table-bordered">
-                    <tr>    <td>Service:</td>   <td data-bind="text: service"></td>     </tr>
-                    <tr>    <td>Username:</td>  <td data-bind="text: username"></td>    </tr>
-                    <tr>    <td>Email:</td>     <td data-bind="text: email"></td>       </tr>
-                    <tr>    <td>Password:</td>  <td data-bind="text: password"></td>    </tr>
-                    <tr>    <td>Extra:</td>     <td data-bind="text: extra"></td>       </tr>
+            <div data-bind="visible: !isEditable()" class="col-sm-6 col-md-4">
+                <table class="table table-bordered">
+                    <tr>                                <td>Service</td>    <td data-bind="text: service() || 'None'"></td>     </tr>
+                    <tr>                                <td>Username</td>   <td data-bind="text: username() || 'None'"></td>    </tr>
+                    <tr>                                <td>Email</td>      <td data-bind="text: email() || 'None'"></td>       </tr>
+                    <tr data-bind="if: isRevealed">     <td>Password</td>   <td data-bind="text: password"></td>                </tr>
+                    <tr data-bind="ifnot: isRevealed">  <td>Password</td>   <td>******************************</td>             </tr>
+                    <tr>                                <td>Extra</td>      <td data-bind="text: extra() || 'None'"></td>       </tr>
                 </table>
                 <button data-bind="click: $parent.editItem" class="btn btn-default btn-sm">
                     <span class="glyphicon glyphicon-edit text-info"></span> Edit
                 </button>
-                <button data-bind="click: $parent.removeItem" class="btn btn-default btn-sm">
+                <!--<button data-bind="click: $parent.removeItem" class="btn btn-default btn-sm">
                     <span class="glyphicon glyphicon-remove text-danger"></span> Delete
+                </button>-->
+                <button data-bind="visible: isRevealed, click: $parent.concealPassword" class="btn btn-default btn-sm">
+                    <span class="glyphicon glyphicon-eye-close"></span> Conceal
+                </button>
+                <button data-bind="visible: !isRevealed(), click: $parent.revealPassword" class="btn btn-default btn-sm">
+                    <span class="glyphicon glyphicon-eye-open"></span> Reveal
                 </button>
                 <br><br>
             </div>
